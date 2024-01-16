@@ -30,6 +30,10 @@
 #Implemented top value limit to numchk()
 #Adjusted numchk() to allow flexible bottom value
 
+#v0.8
+#Functionalised possibly repeated code for future use
+#Functionalised main code in __main__ function
+
 #Import python-code
 import random
 
@@ -70,6 +74,10 @@ def yesprmpt(text):
         xyn = input(text)
     return xyn
 
+def dieroll():
+    roll = random.randrange(1, 21)
+    return roll
+
 def advroll(adv):
     dice = 1
     AdvRoll = []
@@ -82,60 +90,64 @@ def advroll(adv):
     return AdvRoll[0]
 
 #Start of App
-loop = "yes"
-TarAC = numchk("Enter Target Character AC: ", 8, 50)
-WeaQtyDie = numchk("Enter how many Hit Die for the weapon: ", 1, 50)
-WeaDmgDie = dietype("Equiped Weapon", WeaQtyDie)
-AckBonus = numchk("Enter Weapon Bonuses: ", -5, 50)
-CricPmpt = yesprmpt('Is your character a champion or has item to reduce your critial hit to 19?: ')
+def main():
+    loop = "yes"
+    TarAC = numchk("Enter Target Character AC: ", 8, 50)
+    WeaQtyDie = numchk("Enter how many Hit Die for the weapon: ", 1, 50)
+    WeaDmgDie = dietype("Equiped Weapon", WeaQtyDie)
+    AckBonus = numchk("Enter Weapon Bonuses: ", -5, 50)
+    CricPmpt = yesprmpt('Is your character a champion or has item to reduce your critial hit to 19?: ')
 
-if CricPmpt in ('y', 'yes'):
-    CricMod = 1
-else:
-    CricMod = 0
-
-while loop in ("yes", "y"):
-    AdvMod = ''
-    while not AdvMod or AdvMod > '3' or AdvMod <= "0" or not bool(AdvMod) and not AdvMod.isdigit:
-        AdvMod = input ('''
-Is this attack the following?
-1 - Normal
-2 - Advantage
-3 - Disadvantage
-: ''')
-
-        if AdvMod == '2':
-            ACroll = advroll(True)
-        elif AdvMod == '3':
-            ACroll = advroll(False)
-        else:
-            ACroll = random.randrange(1, 21)
-    ACTot = ACroll + int(AckBonus)
-    print ("\nAttack Roll =",ACroll, "+", AckBonus,"=", ACTot)
-    
-    
-    if ACroll >= 20-CricMod:
-        dmg = 2
-        print("Critical Success!! Roll double for damage!")
-    elif ACroll == 1:
-        dmg = 0
-        print("Critical MISS!!")
-    elif ACTot >= int(TarAC):
-        dmg = 1
-        print("Target Hits, roll for damage!")    
+    if CricPmpt in ('y', 'yes'):
+        CricMod = 1
     else:
-        dmg = 0
-        print("Target misses!")
+        CricMod = 0
 
-    if dmg > 0:
-        DmgDice = 1
-        DmgRolls = []
-        while DmgDice <= dmg*WeaQtyDie:
-            BaseDmg = random.randrange(1, WeaDmgDie+1)
-            print ('Roll', DmgDice, '=', BaseDmg)
-            DmgRolls.append(BaseDmg)
-            DmgDice += 1
-        print('Damage Roll:', sum(DmgRolls), "+", AckBonus, "=", sum(DmgRolls)+AckBonus)
-        print("\nYou have damaged your target for", sum(DmgRolls)+AckBonus, "hit points!")
+    while loop in ("yes", "y"):
+        AdvMod = ''
+        while not AdvMod or AdvMod > '3' or AdvMod <= "0" or not bool(AdvMod) and not AdvMod.isdigit:
+            AdvMod = input ('''
+    Is this attack the following?
+    1 - Normal
+    2 - Advantage
+    3 - Disadvantage
+    : ''')
 
-    loop = yesprmpt("Attack Again? (y/n): " )
+            if AdvMod == '2':
+                ACroll = advroll(True)
+            elif AdvMod == '3':
+                ACroll = advroll(False)
+            else:
+                ACroll = dieroll()
+        ACTot = ACroll + int(AckBonus)
+        print ("\nAttack Roll =",ACroll, "+", AckBonus,"=", ACTot)
+        
+        
+        if ACroll >= 20-CricMod:
+            dmg = 2
+            print("Critical Success!! Roll double for damage!")
+        elif ACroll == 1:
+            dmg = 0
+            print("Critical MISS!!")
+        elif ACTot >= int(TarAC):
+            dmg = 1
+            print("Target Hits, roll for damage!")    
+        else:
+            dmg = 0
+            print("Target misses!")
+
+        if dmg > 0:
+            DmgDice = 1
+            DmgRolls = []
+            while DmgDice <= dmg*WeaQtyDie:
+                BaseDmg = random.randrange(1, WeaDmgDie+1)
+                print ('Roll', DmgDice, '=', BaseDmg)
+                DmgRolls.append(BaseDmg)
+                DmgDice += 1
+            print('Damage Roll:', sum(DmgRolls), "+", AckBonus, "=", sum(DmgRolls)+AckBonus)
+            print("\nYou have damaged your target for", sum(DmgRolls)+AckBonus, "hit points!")
+
+        loop = yesprmpt("Attack Again? (y/n): " )
+
+if __name__ == '__main__':
+    main()
